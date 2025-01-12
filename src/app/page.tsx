@@ -1,101 +1,205 @@
+"use client";
+
+import { Leva, useControls } from "leva";
+import { useMemo, useState } from "react";
+import { useRef } from "react";
+import { FidgetSpinner } from "react-fidget-spinner";
+import { useDebounceCallback } from "usehooks-ts";
+import Confetti from "react-dom-confetti";
+import { useEffect } from "react";
 import Image from "next/image";
+const colours = [
+  { name: "yellow", value: "#F3D173" },
+  { name: "gray", value: "#CBCBCB" },
+  { name: "blue", value: "#7395f3" },
+  { name: "red", value: "#f39173" },
+  { name: "lime", value: "#d5f373" },
+  { name: "purple", value: "#d173f3" },
+  { name: "teal", value: "#73f3d1" },
+];
+
+enum ControlName {
+  Spinner = "Spinner",
+  Bubbles = "Bubbles",
+  Sparks = "Sparks",
+  Vibes = "Vibes",
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const spinner = useControls(
+    ControlName.Spinner,
+    {
+      emoji: { value: "🦧", label: "Text/Emoji" },
+      size: { value: 2, min: 0, max: 5, label: "Size" },
+    },
+    { color: colours[0].value }
+  );
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const bubbles = useControls(
+    ControlName.Bubbles,
+    {
+      emoji: { value: "oo oo ", label: "Text/Emoji" },
+      emoji2: { value: "ee ee", label: "Text/Emoji" },
+      emoji3: { value: "ah ah", label: "Text/Emoji" },
+    },
+    { color: colours[2].value }
+  );
+
+  const sparks = useControls(
+    ControlName.Sparks,
+    {
+      emoji: { value: "🥜", label: "Text/Emoji" },
+      emoji2: {
+        value: "🍌",
+        label: "Text/Emoji",
+      },
+      emoji3: {
+        value: "",
+        label: "Text/Emoji",
+      },
+    },
+    { color: colours[6].value }
+  );
+
+  const vibes = useControls(
+    ControlName.Vibes,
+    {
+      background: { value: colours[5].value, label: "Background" },
+      branding: { value: true, label: "Branding" },
+    },
+    { color: colours[3].value }
+  );
+
+  const scaleRef = useRef(1);
+
+  const [isExploding, setIsExploding] = useState(false);
+
+  const onScaleChange = (scale: number, audioPath: string) => {
+    if (scale > scaleRef.current) {
+      const audio = new Audio(audioPath);
+      audio.play().catch(console.error);
+    }
+    scaleRef.current = scale;
+  };
+
+  const debouncedOnScaleChange = useDebounceCallback(onScaleChange, 100);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isExploding) {
+      timeout = setTimeout(() => {
+        setIsExploding(false);
+      }, 1000);
+    }
+    return () => clearTimeout(timeout);
+  }, [isExploding]);
+
+  const velocityBreakpoints = useMemo(() => {
+    const scaleRange = [1, 5];
+    const breakpointRange = [0.1, 0.9];
+    const audioPaths = [
+      "/JetSetRadio_0.mp3",
+      "/JetSetRadio_1.mp3",
+      "/JetSetRadio_2.mp3",
+      "/JetSetRadio_3.mp3",
+      "/JetSetRadio_4.mp3",
+      "/JetSetRadio_5.mp3",
+      "/JetSetRadio_6.mp3",
+    ];
+
+    const breakpoints = audioPaths.map((audioPath, index) => {
+      const breakpoint =
+        breakpointRange[0] +
+        (index * (breakpointRange[1] - breakpointRange[0])) /
+          (audioPaths.length - 1);
+      const scale =
+        scaleRange[0] +
+        (index * (scaleRange[1] - scaleRange[0])) / (audioPaths.length - 1);
+
+      const isLast = index === audioPaths.length - 1;
+
+      return {
+        breakpoint,
+        config: {
+          scaleConfig: {
+            onScaleChange: (scale: number) => {
+              debouncedOnScaleChange(scale, audioPath);
+              if (isLast) {
+                setIsExploding(true);
+              }
+            },
+            scale,
+          },
+        },
+      };
+    });
+
+    return breakpoints;
+  }, [debouncedOnScaleChange]);
+
+  return (
+    <>
+      <Leva
+        titleBar={{ title: "make your own fidget spinner!" }}
+        collapsed={true}
+      />
+      <div
+        className="font-[family-name:var(--font-geist-sans)] w-screen h-screen flex flex-col items-center justify-between overflow-hidden py-50 px-10"
+        style={{ background: vibes.background }}
+      >
+        <Wrapper>{null}</Wrapper>
+        <div className="size-4">
+          <Confetti active={isExploding} />
+
+          <FidgetSpinner
+            scaleConfig={{
+              onScaleChange: (scale) => {
+                onScaleChange(scale, "/JetSetRadio_0.mp3");
+              },
+            }}
+            bubbleConfig={{
+              active: false,
+              components: [bubbles.emoji, bubbles.emoji2, bubbles.emoji3],
+            }}
+            sparkConfig={{
+              active: false,
+              components: [sparks.emoji, sparks.emoji2, sparks.emoji3],
+            }}
+            spinnerConfig={{
+              maxAngularVelocity: 100,
+            }}
+            velocityBreakpoints={velocityBreakpoints}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <div
+              className="text-4xl font-bold select-none relative"
+              style={{ transform: `scale(${spinner.size})` }}
+            >
+              {spinner.emoji}
+            </div>
+          </FidgetSpinner>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <Wrapper>{vibes.branding && <Branding />}</Wrapper>
+      </div>
+    </>
   );
 }
+
+const Wrapper = ({ children }: { children: React.ReactNode }) => {
+  return <div className="h-10">{children}</div>;
+};
+
+const Branding = () => {
+  return (
+    <a href="https://www.npmjs.com/package/react-fidget-spinner">
+      <div className="flex gap-4">
+        <span className="text-sm font-mono">react-fidget-spinner</span>
+        <Image
+          src="https://img.shields.io/npm/v/react-fidget-spinner.svg"
+          alt="npm version"
+          width={80}
+          height={20}
+        />
+      </div>
+    </a>
+  );
+};
