@@ -8,6 +8,8 @@ import { useDebounceCallback } from "usehooks-ts";
 import Confetti from "react-dom-confetti";
 import { useEffect } from "react";
 import Image from "next/image";
+import { spinnerConfigs } from "./config";
+import { FaEye, FaEyeSlash, FaUser, FaUserAltSlash } from "react-icons/fa";
 const colours = [
   { name: "yellow", value: "#F3D173" },
   { name: "gray", value: "#CBCBCB" },
@@ -25,48 +27,96 @@ enum ControlName {
   Vibes = "Vibes",
 }
 
+const defaultConfig = {
+  spinner: {
+    emoji: "🦧",
+    size: 2,
+  },
+  bubbles: {
+    emoji: "oo oo",
+    emoji2: "oo oo",
+    emoji3: "oo oo",
+  },
+  sparks: {
+    emoji: "🥜",
+    emoji2: "🍌",
+    emoji3: "",
+  },
+  vibes: {
+    background: colours[5].value,
+    branding: true,
+  },
+};
+
 export default function Home() {
-  const spinner = useControls(
+  const [config, setConfig] = useState(defaultConfig);
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleIsOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const isHidden = isOpen;
+
+  const [isAuthor, setIsAuthor] = useState(false);
+
+  const toggleIsAuthor = () => {
+    setIsAuthor(!isAuthor);
+  };
+
+  const randomise = () => {
+    const newConfig =
+      spinnerConfigs[Math.floor(Math.random() * spinnerConfigs.length)];
+    setConfig(newConfig);
+    setSpinner(newConfig.spinner);
+    setBubbles(newConfig.bubbles);
+    setSparks(newConfig.sparks);
+    setVibes(newConfig.vibes);
+  };
+
+  const [spinner, setSpinner] = useControls(
     ControlName.Spinner,
-    {
-      emoji: { value: "🦧", label: "Text/Emoji" },
-      size: { value: 2, min: 0, max: 5, label: "Size" },
-    },
+    () => ({
+      emoji: { value: config.spinner.emoji, label: "Text/Emoji" },
+      size: { value: config.spinner.size, min: 0, max: 5, label: "Size" },
+    }),
     { color: colours[0].value }
   );
 
-  const bubbles = useControls(
+  const [bubbles, setBubbles] = useControls(
     ControlName.Bubbles,
-    {
-      emoji: { value: "oo oo ", label: "Text/Emoji" },
-      emoji2: { value: "ee ee", label: "Text/Emoji" },
-      emoji3: { value: "ah ah", label: "Text/Emoji" },
-    },
+    () => ({
+      emoji: { value: config.bubbles.emoji, label: "Text/Emoji" },
+      emoji2: { value: config.bubbles.emoji2, label: "Text/Emoji" },
+      emoji3: { value: config.bubbles.emoji3, label: "Text/Emoji" },
+    }),
     { color: colours[2].value }
   );
 
-  const sparks = useControls(
+  const [sparks, setSparks] = useControls(
     ControlName.Sparks,
-    {
-      emoji: { value: "🥜", label: "Text/Emoji" },
+    () => ({
+      emoji: { value: config.sparks.emoji, label: "Text/Emoji" },
       emoji2: {
-        value: "🍌",
+        value: config.sparks.emoji2,
         label: "Text/Emoji",
       },
       emoji3: {
-        value: "",
+        value: config.sparks.emoji3,
         label: "Text/Emoji",
       },
-    },
+    }),
     { color: colours[6].value }
   );
 
-  const vibes = useControls(
+  const [vibes, setVibes] = useControls(
     ControlName.Vibes,
-    {
-      background: { value: colours[5].value, label: "Background" },
-      branding: { value: true, label: "Branding" },
-    },
+    () => ({
+      background: { value: config.vibes.background, label: "Background" },
+      branding: { value: config.vibes.branding, label: "Branding" },
+      author: { value: "Rick", label: "Author" },
+    }),
     { color: colours[3].value }
   );
 
@@ -137,20 +187,24 @@ export default function Home() {
     return breakpoints;
   }, [debouncedOnScaleChange]);
 
+  const hiddenClassName = isHidden ? "hidden" : "";
+
   return (
     <>
-      <Leva
-        titleBar={{ title: "make your own fidget spinner!" }}
-        collapsed={true}
-      />
+      <div className={hiddenClassName}>
+        <Leva titleBar={{ title: "make your own" }} collapsed={true} />
+      </div>
       <div
-        className="font-[family-name:var(--font-geist-sans)] w-screen h-screen flex flex-col items-center justify-between overflow-hidden py-50 px-10"
+        className="font-[family-name:var(--font-geist-sans)] w-screen h-screen flex flex-col items-center justify-between overflow-hidden py-32 px-10"
         style={{ background: vibes.background }}
       >
         <Wrapper>{null}</Wrapper>
         <div className="size-4">
           <Confetti active={isExploding} />
-
+          <HoveringControls>
+            <AuthorButton isActive={isAuthor} onClick={toggleIsAuthor} />
+            <EyeButton isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
+          </HoveringControls>
           <FidgetSpinner
             scaleConfig={{
               onScaleChange: (scale) => {
@@ -178,28 +232,127 @@ export default function Home() {
             </div>
           </FidgetSpinner>
         </div>
-        <Wrapper>{vibes.branding && <Branding />}</Wrapper>
+        <div className="flex flex-col gap-8 items-center justify-center">
+          <div
+            className="flex flex-col gap-8 items-center justify-center"
+            style={{ visibility: isAuthor ? "hidden" : "visible" }}
+          >
+            <Author author={vibes.author} />
+          </div>
+          <div
+            className={`flex flex-col gap-8`}
+            style={{ visibility: isHidden ? "hidden" : "visible" }}
+          >
+            <RainbowButton
+              background={vibes.background}
+              onClick={() => {
+                randomise();
+              }}
+            />
+            <Wrapper>{vibes.branding && <Branding />}</Wrapper>
+          </div>
+        </div>
       </div>
     </>
   );
 }
 
+const Author = ({ author }: { author: string }) => {
+  return (
+    <div className="text-sm font-mono">made by {author.toLowerCase()}</div>
+  );
+};
+
 const Wrapper = ({ children }: { children: React.ReactNode }) => {
   return <div className="h-10">{children}</div>;
 };
 
+const AuthorButton = ({
+  isActive,
+  onClick,
+}: {
+  isActive: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <div className="h-10">
+      <button onClick={onClick}>
+        {isActive ? <FaUserAltSlash /> : <FaUser />}
+      </button>
+    </div>
+  );
+};
+
+const HoveringControls = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="h-10 w-full absolute top-10 left-10 flex gap-4">
+      {children}
+    </div>
+  );
+};
+
+const EyeButton = ({
+  isOpen,
+  toggleIsOpen,
+}: {
+  isOpen: boolean;
+  toggleIsOpen: () => void;
+}) => {
+  return (
+    <div className="h-10">
+      <button onClick={toggleIsOpen}>
+        {isOpen ? <FaEyeSlash /> : <FaEye />}
+      </button>
+    </div>
+  );
+};
+
+const RainbowButton = ({
+  background,
+  onClick,
+}: {
+  background: string;
+  onClick: () => void;
+}) => {
+  const size = "h-10 w-full";
+
+  return (
+    <div className="relative">
+      <button className={`rainbow-button ${size}`} onClick={onClick}></button>
+      <div
+        className={
+          "absolute inset-1 rounded-sm pointer-events-none text-white z-30 text-xs font-mono flex items-center justify-center"
+        }
+      >
+        randomise
+      </div>
+      <div
+        className={
+          "absolute inset-1 rounded-sm pointer-events-none bg-black z-20 opacity-50"
+        }
+      ></div>
+      <div
+        className="absolute inset-1 rounded-sm pointer-events-none flex items-center justify-center"
+        style={{
+          background: background,
+        }}
+      ></div>
+    </div>
+  );
+};
+
 const Branding = () => {
   return (
-    <a href="https://www.npmjs.com/package/react-fidget-spinner">
-      <div className="flex gap-4">
-        <span className="text-sm font-mono">react-fidget-spinner</span>
+    <div className="flex gap-4">
+      <span className="text-sm font-mono">react-fidget-spinner</span>
+      <a href="https://www.npmjs.com/package/react-fidget-spinner">
         <Image
           src="https://img.shields.io/npm/v/react-fidget-spinner.svg"
           alt="npm version"
           width={80}
           height={20}
         />
-      </div>
-    </a>
+      </a>
+    </div>
   );
 };
