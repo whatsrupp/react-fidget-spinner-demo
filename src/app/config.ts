@@ -17,7 +17,8 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#e6e6ff",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
     },
   },
   {
@@ -38,7 +39,8 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#fff5e6",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
     },
   },
   {
@@ -59,7 +61,8 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#e6ffe6",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
     },
   },
   {
@@ -80,7 +83,8 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#f2e6ff",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
     },
   },
   {
@@ -101,7 +105,8 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#e6f9ff",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
     },
   },
   {
@@ -122,7 +127,8 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#ffd9b3",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
     },
   },
   {
@@ -143,7 +149,8 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#d9d9d9",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
     },
   },
   {
@@ -164,7 +171,29 @@ export const spinnerConfigs = [
     },
     vibes: {
       background: "#f2e6d9",
-      branding: true,
+      showAuthor: true,
+      author: "Rick",
+    },
+  },
+  {
+    spinner: {
+      emoji: "🦧",
+      size: 2,
+    },
+    bubbles: {
+      emoji: "oo oo",
+      emoji2: "oo oo",
+      emoji3: "oo oo",
+    },
+    sparks: {
+      emoji: "🥜",
+      emoji2: "🍌",
+      emoji3: "",
+    },
+    vibes: {
+      background: "#f3d173",
+      showAuthor: true,
+      author: "Rick",
     },
   },
 ] as const;

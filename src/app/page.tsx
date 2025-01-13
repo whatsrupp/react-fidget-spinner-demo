@@ -9,7 +9,7 @@ import Confetti from "react-dom-confetti";
 import { useEffect } from "react";
 import Image from "next/image";
 import { spinnerConfigs } from "./config";
-import { FaEye, FaEyeSlash, FaUser, FaUserAltSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 const colours = [
   { name: "yellow", value: "#F3D173" },
   { name: "gray", value: "#CBCBCB" },
@@ -44,26 +44,21 @@ const defaultConfig = {
   },
   vibes: {
     background: colours[5].value,
-    branding: true,
+    showAuthor: true,
+    author: "Rick",
   },
 };
 
 export default function Home() {
   const [config, setConfig] = useState(defaultConfig);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const toggleIsOpen = () => {
     setIsOpen(!isOpen);
   };
 
-  const isHidden = isOpen;
-
-  const [isAuthor, setIsAuthor] = useState(false);
-
-  const toggleIsAuthor = () => {
-    setIsAuthor(!isAuthor);
-  };
+  const isHidden = !isOpen;
 
   const randomise = () => {
     const newConfig =
@@ -114,8 +109,8 @@ export default function Home() {
     ControlName.Vibes,
     () => ({
       background: { value: config.vibes.background, label: "Background" },
-      branding: { value: config.vibes.branding, label: "Branding" },
-      author: { value: "Rick", label: "Author" },
+      author: { value: "Rick", label: "Made By" },
+      showAuthor: { value: true, label: "Author" },
     }),
     { color: colours[3].value }
   );
@@ -187,22 +182,19 @@ export default function Home() {
     return breakpoints;
   }, [debouncedOnScaleChange]);
 
-  const hiddenClassName = isHidden ? "hidden" : "";
-
   return (
     <>
-      <div className={hiddenClassName}>
+      <div style={{ visibility: isHidden ? "hidden" : "visible" }}>
         <Leva titleBar={{ title: "make your own" }} collapsed={true} />
       </div>
       <div
-        className="font-[family-name:var(--font-geist-sans)] w-screen h-screen flex flex-col items-center justify-between overflow-hidden py-32 px-10"
+        className="font-[family-name:var(--font-geist-sans)] w-screen h-screen flex flex-col items-center justify-between overflow-hidden py-24 px-10"
         style={{ background: vibes.background }}
       >
         <Wrapper>{null}</Wrapper>
         <div className="size-4">
           <Confetti active={isExploding} />
           <HoveringControls>
-            <AuthorButton isActive={isAuthor} onClick={toggleIsAuthor} />
             <EyeButton isOpen={isOpen} toggleIsOpen={toggleIsOpen} />
           </HoveringControls>
           <FidgetSpinner
@@ -232,10 +224,10 @@ export default function Home() {
             </div>
           </FidgetSpinner>
         </div>
-        <div className="flex flex-col gap-8 items-center justify-center">
+        <div className="flex flex-col gap-14 items-center justify-center">
           <div
-            className="flex flex-col gap-8 items-center justify-center"
-            style={{ visibility: isAuthor ? "hidden" : "visible" }}
+            className="flex items-center justify-center"
+            style={{ visibility: vibes.showAuthor ? "visible" : "hidden" }}
           >
             <Author author={vibes.author} />
           </div>
@@ -249,7 +241,9 @@ export default function Home() {
                 randomise();
               }}
             />
-            <Wrapper>{vibes.branding && <Branding />}</Wrapper>
+            <Wrapper>
+              <Branding />
+            </Wrapper>
           </div>
         </div>
       </div>
@@ -259,28 +253,14 @@ export default function Home() {
 
 const Author = ({ author }: { author: string }) => {
   return (
-    <div className="text-sm font-mono">made by {author.toLowerCase()}</div>
+    <div className="text-xs font-mono select-none">
+      made by {author.toLowerCase()}
+    </div>
   );
 };
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => {
   return <div className="h-10">{children}</div>;
-};
-
-const AuthorButton = ({
-  isActive,
-  onClick,
-}: {
-  isActive: boolean;
-  onClick: () => void;
-}) => {
-  return (
-    <div className="h-10">
-      <button onClick={onClick}>
-        {isActive ? <FaUserAltSlash /> : <FaUser />}
-      </button>
-    </div>
-  );
 };
 
 const HoveringControls = ({ children }: { children: React.ReactNode }) => {
@@ -299,10 +279,13 @@ const EyeButton = ({
   toggleIsOpen: () => void;
 }) => {
   return (
-    <div className="h-10">
+    <div className="h-10 flex flex-col gap-2">
       <button onClick={toggleIsOpen}>
-        {isOpen ? <FaEyeSlash /> : <FaEye />}
+        {isOpen ? <FaEye /> : <FaEyeSlash />}
       </button>
+      {isOpen && (
+        <span className="text-[8px] font-mono select-none">hide controls</span>
+      )}
     </div>
   );
 };
@@ -321,7 +304,7 @@ const RainbowButton = ({
       <button className={`rainbow-button ${size}`} onClick={onClick}></button>
       <div
         className={
-          "absolute inset-1 rounded-sm pointer-events-none text-white z-30 text-xs font-mono flex items-center justify-center"
+          "absolute inset-1 rounded-sm pointer-events-none text-white z-30 text-xs font-mono flex items-center justify-center select-none"
         }
       >
         randomise
@@ -344,7 +327,9 @@ const RainbowButton = ({
 const Branding = () => {
   return (
     <div className="flex gap-4">
-      <span className="text-sm font-mono">react-fidget-spinner</span>
+      <span className="text-sm font-mono select-none">
+        react-fidget-spinner
+      </span>
       <a href="https://www.npmjs.com/package/react-fidget-spinner">
         <Image
           src="https://img.shields.io/npm/v/react-fidget-spinner.svg"
