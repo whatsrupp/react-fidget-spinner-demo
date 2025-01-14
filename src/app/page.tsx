@@ -33,9 +33,9 @@ const defaultConfig = {
     size: 2,
   },
   bubbles: {
-    emoji: "oo oo",
-    emoji2: "oo oo",
-    emoji3: "oo oo",
+    emoji: "ooo",
+    emoji2: "eee",
+    emoji3: "aaa",
   },
   sparks: {
     emoji: "🥜",
