@@ -46,6 +46,8 @@ const defaultConfig = {
     background: colours[5].value,
     showAuthor: true,
     author: "Rick",
+    showTitle: true,
+    title: "Ooo Eee Aaa Aaa",
   },
 };
 
@@ -108,9 +110,11 @@ export default function Home() {
   const [vibes, setVibes] = useControls(
     ControlName.Vibes,
     () => ({
+      title: { value: config.vibes.title, label: "Title" },
+      author: { value: config.vibes.author, label: "Made By" },
       background: { value: config.vibes.background, label: "Background" },
-      author: { value: "Rick", label: "Made By" },
-      showAuthor: { value: true, label: "Author" },
+      showTitle: { value: config.vibes.showTitle, label: "Show Title" },
+      showAuthor: { value: config.vibes.showAuthor, label: "Show Author" },
     }),
     { color: colours[3].value }
   );
@@ -191,7 +195,9 @@ export default function Home() {
         className="font-[family-name:var(--font-geist-sans)] w-screen h-screen flex flex-col items-center justify-between overflow-hidden py-24 px-10"
         style={{ background: vibes.background }}
       >
-        <Wrapper>{null}</Wrapper>
+        <Wrapper>
+          {vibes.showTitle && <Text text={vibes.title.toLowerCase()} />}
+        </Wrapper>
         <div className="size-4">
           <Confetti active={isExploding} />
           <HoveringControls>
@@ -252,11 +258,11 @@ export default function Home() {
 }
 
 const Author = ({ author }: { author: string }) => {
-  return (
-    <div className="text-xs font-mono select-none">
-      made by {author.toLowerCase()}
-    </div>
-  );
+  return <Text text={`made by ${author.toLowerCase()}`} />;
+};
+
+const Text = ({ text }: { text: string }) => {
+  return <div className="text-xs font-mono select-none">{text}</div>;
 };
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => {

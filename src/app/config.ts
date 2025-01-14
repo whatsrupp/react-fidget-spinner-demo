@@ -16,9 +16,11 @@ export const spinnerConfigs = [
       emoji3: "⭐",
     },
     vibes: {
+      title: "Space Explorer",
       background: "#e6e6ff",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -38,9 +40,11 @@ export const spinnerConfigs = [
       emoji3: "🥘",
     },
     vibes: {
+      title: "Chef's Special",
       background: "#fff5e6",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -60,9 +64,11 @@ export const spinnerConfigs = [
       emoji3: "🌼",
     },
     vibes: {
+      title: "Garden Party",
       background: "#e6ffe6",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -82,9 +88,11 @@ export const spinnerConfigs = [
       emoji3: "🎹",
     },
     vibes: {
+      title: "Music Mania",
       background: "#f2e6ff",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -104,9 +112,11 @@ export const spinnerConfigs = [
       emoji3: "🦈",
     },
     vibes: {
+      title: "Ocean Adventure",
       background: "#e6f9ff",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -126,9 +136,11 @@ export const spinnerConfigs = [
       emoji3: "😭",
     },
     vibes: {
+      title: "Dad Jokes",
       background: "#ffd9b3",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -148,9 +160,11 @@ export const spinnerConfigs = [
       emoji3: "🫠",
     },
     vibes: {
+      title: "Existential Crisis",
       background: "#d9d9d9",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -170,9 +184,11 @@ export const spinnerConfigs = [
       emoji3: "💫",
     },
     vibes: {
+      title: "Coffee Addict",
       background: "#f2e6d9",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
   {
@@ -191,9 +207,11 @@ export const spinnerConfigs = [
       emoji3: "",
     },
     vibes: {
+      title: "Ooo Eee Ahh Ahh",
       background: "#f3d173",
       showAuthor: true,
       author: "Rick",
+      showTitle: true,
     },
   },
 ] as const;
